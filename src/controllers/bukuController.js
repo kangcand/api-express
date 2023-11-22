@@ -4,9 +4,9 @@ const connection = mysql.createConnection(config);
 connection.connect();
 
 // menampilkan semua data
-const getDataPenulis = async (req, res) => {
+const getDataBuku = async (req, res) => {
     const data = await new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM penulis", function (error, rows) {
+        connection.query("SELECT * FROM buku", function (error, rows) {
             if (rows) {
                 resolve(rows);
             } else {
@@ -29,10 +29,10 @@ const getDataPenulis = async (req, res) => {
     }
 }
 
-const getDataPenulisById = async (req, res) => {
+const getDataBukuById = async (req, res) => {
     let id = req.params.id;
-    const dataPenulis = await new Promise((resolve, reject) => {
-        const query = "SELECT * FROM penulis WHERE id = ?";
+    const data = await new Promise((resolve, reject) => {
+        const query = "SELECT * FROM buku WHERE id = ?";
         connection.query(query, [id], function (err, rows) {
             if (err) {
                 reject(err);
@@ -42,41 +42,32 @@ const getDataPenulisById = async (req, res) => {
         });
     });
 
-    if (dataPenulis.length > 0) {
-        const dataBuku = await new Promise((resolve, reject) => {
-            const query = "SELECT * FROM buku WHERE id_penulis = ?";
-            connection.query(query, [id], function (err, rows) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
-        });
-
+    if (data.length > 0) {
         res.send({
             success: true,
-            message: "Berhasil",
-            dataPenulis: dataPenulis[0], // Ambil data penulis dari array hasil query
-            dataBuku: dataBuku
+            message: "berhasil",
+            data: data
         });
     } else {
         res.send({
             success: false,
-            message: "Data penulis tidak ditemukan",
+            message: "Data tidak ditemukan",
         });
     }
 }
 
 
-const addDataPenulis = async (req, res) => {
+const addDataBuku = async (req, res) => {
     let data = {
-        nama: req.body.nama,
-        jenis_kelamin: req.body.jenis_kelamin,
-        alamat: req.body.alamat
+        id_penulis: req.body.id_penulis,
+        judul: req.body.judul,
+        isbn: req.body.isbn,
+        deskripsi: req.body.deskripsi,
+        qty: req.body.qty
+
     }
     const result = await new Promise((resolve, reject) => {
-        const query = 'INSERT INTO penulis SET ?';
+        const query = 'INSERT INTO buku SET ?';
         connection.query(query, [data], function (err, rows) {
             if (rows) {
                 resolve(rows);
@@ -99,15 +90,17 @@ const addDataPenulis = async (req, res) => {
     }
 }
 
-const editDataPenulis = async (req, res) => {
+const editDataBuku = async (req, res) => {
     let id = req.params.id;
     let data = {
-        nama: req.body.nama,
-        jenis_kelamin: req.body.jenis_kelamin,
-        alamat: req.body.alamat
+        judul: req.body.judul,
+        isbn: req.body.isbn,
+        deskripsi: req.body.deskripsi,
+        qty: req.body.qty,
+        id_penulis: req.body.id_penulis,
     }
     const result = await new Promise((resolve, reject) => {
-        const query = 'UPDATE penulis SET ? where id = ?';
+        const query = 'UPDATE buku SET ? where id = ?';
         connection.query(query, [data, id], function (err, rows) {
             if (rows) {
                 resolve(rows);
@@ -130,11 +123,11 @@ const editDataPenulis = async (req, res) => {
     }
 }
 
-const deleteDataPenulis = async (req, res) => {
+const deleteDataBuku = async (req, res) => {
     let id = req.params.id;
 
     const result = await new Promise((resolve, reject) => {
-        const query = 'DELETE FROM penulis where id = ?';
+        const query = 'DELETE FROM buku where id = ?';
         connection.query(query, [id], function (err, rows) {
             if (rows) {
                 resolve(rows);
@@ -159,9 +152,9 @@ const deleteDataPenulis = async (req, res) => {
 
 
 module.exports = {
-    getDataPenulis,
-    getDataPenulisById,
-    addDataPenulis,
-    editDataPenulis,
-    deleteDataPenulis
+    getDataBuku,
+    getDataBukuById,
+    addDataBuku,
+    editDataBuku,
+    deleteDataBuku
 }
